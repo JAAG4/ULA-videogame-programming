@@ -31,7 +31,7 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     srand(time(NULL));
 }
 
-void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
+void handle_input_pong(struct Pong *pong, ALLEGRO_KEYBOARD_STATE *state)
 {
     if (pong->state == START)
     {
@@ -71,19 +71,6 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
         {
             pong->player1.vy = 0;
         }
-
-        if (al_key_down(state, ALLEGRO_KEY_DOWN))
-        {
-            pong->player2.vy = PADDLE_SPEED;
-        }
-        else if (al_key_down(state, ALLEGRO_KEY_UP))
-        {
-            pong->player2.vy = -PADDLE_SPEED;
-        }
-        else
-        {
-            pong->player2.vy = 0;
-        }
     }
     else
     {
@@ -107,7 +94,7 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
     }
 }
 
-void update_pong(struct Pong* pong, double dt)
+void update_pong(struct Pong *pong, double dt)
 {
     if (pong->state == PLAY)
     {
@@ -123,6 +110,20 @@ void update_pong(struct Pong* pong, double dt)
 
         struct Hitbox player2_hitbox;
         build_paddle_hitbox(pong->player2, &player2_hitbox);
+
+        // PLAYER 2 AI Controls
+        if ((pong->ball.y > (pong->player2.y + (int)(pong->player2.height / 2))))
+        {
+            pong->player2.vy = PADDLE_SPEED;
+        }
+        else if ((pong->ball.y <= pong->player2.y + (int)(pong->player2.height / 2)))
+        {
+            pong->player2.vy = -PADDLE_SPEED;
+        }
+        else
+        {
+            pong->player2.vy = 0;
+        }
 
         if (ball_hitbox.x1 > TABLE_WIDTH)
         {
@@ -171,7 +172,7 @@ void update_pong(struct Pong* pong, double dt)
             pong->ball.y = TABLE_HEIGHT - pong->ball.height;
             pong->ball.vy *= -1;
         }
-        
+
         if (collides(ball_hitbox, player1_hitbox))
         {
             al_play_sample(pong->sounds->paddle_hit, /* gain */ 1.0, /* center */ -1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -210,8 +211,7 @@ void render_pong(struct Pong pong, struct Fonts fonts)
     al_draw_filled_rectangle(
         TABLE_WIDTH / 2 - MID_LINE_WIDTH / 2, 0,
         TABLE_WIDTH / 2 + MID_LINE_WIDTH / 2, TABLE_HEIGHT,
-        al_map_rgb(255, 255, 255)
-    );
+        al_map_rgb(255, 255, 255));
     render_paddle(pong.player1);
     render_paddle(pong.player2);
     render_ball(pong.ball);
