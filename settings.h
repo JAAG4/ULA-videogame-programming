@@ -18,8 +18,8 @@
 #define MAX(a, b) ((a > b) ? a : b)
 #endif
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1280 - (int)(1280 / 3)
+#define WINDOW_HEIGHT 720 - (int)(720 / 3)
 #define TABLE_WIDTH 432
 #define TABLE_HEIGHT 243
 #define PADDLE_WIDTH 5
@@ -31,4 +31,3 @@
 #define MID_LINE_WIDTH 2
 #define FPS 60.0
 #define MAX_POINTS 5
-

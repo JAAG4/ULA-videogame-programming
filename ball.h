@@ -23,10 +23,10 @@ struct Ball
     float vy;
 };
 
-void init_ball(struct Ball* ball, float x, float y, float s);
+void init_ball(struct Ball *ball, float x, float y, float s);
 
-void build_ball_hitbox(struct Ball ball, struct Hitbox* hitbox);
+void build_ball_hitbox(struct Ball ball, struct Hitbox *hitbox);
 
-void update_ball(struct Ball* ball, float dt);
+void update_ball(struct Ball *ball, float dt);
 
-void render_ball(struct Ball ball);
+void render_ball(struct Ball ball, ALLEGRO_COLOR color);

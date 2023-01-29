@@ -17,7 +17,17 @@
 #include "fonts.h"
 #include "pong.h"
 
-void init_pong(struct Pong* pong, struct Sounds* sounds)
+bool is_inside(float point, float top, float bottom)
+
+{
+    if (point > top && point < bottom)
+    {
+        return true;
+    }
+    return false;
+}
+
+void init_pong(struct Pong *pong, struct Sounds *sounds)
 {
     init_paddle(&pong->player1, PADDLE_X_OFFSET, PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_paddle(&pong->player2, TABLE_WIDTH - PADDLE_WIDTH - PADDLE_X_OFFSET, TABLE_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -112,17 +122,21 @@ void update_pong(struct Pong *pong, double dt)
         build_paddle_hitbox(pong->player2, &player2_hitbox);
 
         // PLAYER 2 AI Controls
-        if ((pong->ball.y > (pong->player2.y + (int)(pong->player2.height / 2))))
+        if ((ball_hitbox.x1 > TABLE_WIDTH / 4) && pong->ball.vx > 0)
         {
-            pong->player2.vy = PADDLE_SPEED;
-        }
-        else if ((pong->ball.y <= pong->player2.y + (int)(pong->player2.height / 2)))
-        {
-            pong->player2.vy = -PADDLE_SPEED;
-        }
-        else
-        {
-            pong->player2.vy = 0;
+
+            if (is_inside(pong->ball.y, pong->player2.y - rand() % 1 + (pong->player2.height / 4), pong->player2.y + (pong->player2.height / 2) + rand() % 1 + (pong->player2.height / 4)))
+            {
+                pong->player2.vy = 0;
+            }
+            else if ((pong->ball.y > (pong->player2.y + (int)(pong->player2.height / 2))))
+            {
+                pong->player2.vy = PADDLE_SPEED;
+            }
+            else if ((pong->ball.y <= pong->player2.y + (int)(pong->player2.height / 2)))
+            {
+                pong->player2.vy = -PADDLE_SPEED;
+            }
         }
 
         if (ball_hitbox.x1 > TABLE_WIDTH)
@@ -208,20 +222,43 @@ void update_pong(struct Pong *pong, double dt)
 
 void render_pong(struct Pong pong, struct Fonts fonts)
 {
+    ALLEGRO_COLOR wincolor = al_map_rgb(255, 0, 255);
     al_draw_filled_rectangle(
         TABLE_WIDTH / 2 - MID_LINE_WIDTH / 2, 0,
         TABLE_WIDTH / 2 + MID_LINE_WIDTH / 2, TABLE_HEIGHT,
         al_map_rgb(255, 255, 255));
-    render_paddle(pong.player1);
-    render_paddle(pong.player2);
-    render_ball(pong.ball);
+    render_paddle(pong.player1, al_map_rgb(255, 0, 0));
+    render_paddle(pong.player2, al_map_rgb(0, 155, 255));
+    if (pong.ball.vx < 0)
+    {
+
+        ALLEGRO_COLOR color = al_map_rgb(0, 155, 255);
+        render_ball(pong.ball, color);
+    }
+    else
+    {
+
+        ALLEGRO_COLOR color = al_map_rgb(255, 0, 0);
+        render_ball(pong.ball, color);
+    }
 
     char score[3];
     sprintf(score, "%d", pong.player1_score);
-    al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 - 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
+    al_draw_text(fonts.score_font, al_map_rgb(255, 0, 0), TABLE_WIDTH / 2 - 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
     sprintf(score, "%d", pong.player2_score);
-    al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 + 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
-
+    al_draw_text(fonts.score_font, al_map_rgb(0, 155, 255), TABLE_WIDTH / 2 + 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
+    if ((pong.player1_score > 3 || pong.player2_score > 3) && (pong.player1_score < 5 && pong.player2_score < 5))
+    {
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 0), TABLE_WIDTH / 2, TABLE_HEIGHT - (TABLE_HEIGHT / 3), ALLEGRO_ALIGN_CENTER, "Match Point !");
+    }
+    if (pong.player1_score > pong.player2_score)
+    {
+        wincolor = al_map_rgb(255, 0, 0);
+    }
+    else if (pong.player1_score < pong.player2_score)
+    {
+        wincolor = al_map_rgb(0, 155, 255);
+    }
     if (pong.state == START)
     {
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "Press enter to start");
@@ -232,9 +269,15 @@ void render_pong(struct Pong pong, struct Fonts fonts)
     }
     else if (pong.state == DONE)
     {
-        char winner_message[14];
+
+        char winner_message[20];
         sprintf(winner_message, "Player %d won!", pong.winning_player);
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 3, ALLEGRO_ALIGN_CENTER, winner_message);
+        if (pong.winning_player == 2)
+        {
+            sprintf(winner_message, "CPU Player %d won!", pong.winning_player);
+        }
+
+        al_draw_text(fonts.large_font, wincolor, TABLE_WIDTH / 2, TABLE_HEIGHT / 3, ALLEGRO_ALIGN_CENTER, winner_message);
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "Press enter to restart");
     }
 }

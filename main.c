@@ -24,14 +24,14 @@ int main()
     al_install_keyboard();
     al_init_primitives_addon();
 
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_TIMER *timer = al_create_timer(1.0 / FPS);
 
-    ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+    ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
 
-    ALLEGRO_DISPLAY* display = al_create_display(WINDOW_WIDTH, WINDOW_HEIGHT);
+    ALLEGRO_DISPLAY *display = al_create_display(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    ALLEGRO_BITMAP* render_surface = al_create_bitmap(TABLE_WIDTH, TABLE_HEIGHT);
-    
+    ALLEGRO_BITMAP *render_surface = al_create_bitmap(TABLE_WIDTH, TABLE_HEIGHT);
+
     al_init_ttf_addon();
 
     struct Fonts fonts;
@@ -39,7 +39,7 @@ int main()
 
     al_install_audio();
     al_init_acodec_addon();
-    
+
     struct Sounds sounds;
     create_sounds(&sounds);
 
@@ -75,14 +75,12 @@ int main()
             al_get_keyboard_state(&keyboard_state);
             handle_input_pong(&pong, &keyboard_state);
         }
-
         if (redraw && al_is_event_queue_empty(queue))
         {
             float current_frame_time = al_get_time();
             float dt = current_frame_time - last_frame_time;
 
             update_pong(&pong, dt);
-            
             // All of the following draws will be on render_surface
             al_set_target_bitmap(render_surface);
             al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -90,12 +88,12 @@ int main()
 
             // Set the display bitmap as current to render
             al_set_target_bitmap(al_get_backbuffer(display));
-            
+
             al_draw_scaled_bitmap(
                 render_surface,
                 0, 0, TABLE_WIDTH, TABLE_HEIGHT,   // Source x, y, width, height
                 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, // Target x, y, width, height
-                0 // flags
+                0                                  // flags
             );
             al_flip_display();
 

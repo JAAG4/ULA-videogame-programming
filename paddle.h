@@ -22,10 +22,10 @@ struct Paddle
     float vy;
 };
 
-void init_paddle(struct Paddle* paddle, float x, float y, float w, float h);
+void init_paddle(struct Paddle *paddle, float x, float y, float w, float h);
 
-void build_paddle_hitbox(struct Paddle paddle, struct Hitbox* hitbox);
+void build_paddle_hitbox(struct Paddle paddle, struct Hitbox *hitbox);
 
-void update_paddle(struct Paddle* paddle, float dt);
+void update_paddle(struct Paddle *paddle, float dt);
 
-void render_paddle(struct Paddle paddle);
+void render_paddle(struct Paddle paddle, ALLEGRO_COLOR color);
